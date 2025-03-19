@@ -1,4 +1,5 @@
 interface Book {
+    idKey: string
     id?: number;
     title: string;
     author: string[];

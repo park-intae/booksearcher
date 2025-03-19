@@ -7,15 +7,21 @@ import Pagination from './board/Pagination';
 interface BookListProps {
     books: Book[];
     openModal: (type: string, book?: Book) => void;
-    onDelete: (id: number) => void;
+    onDelete: (id: string) => void;
 }
 
 const BookList: React.FC<BookListProps> = ({ books, openModal, onDelete }) => {
     const [currentPage, setCurrentPage] = React.useState(1);
     const booksPerPage = 5; // 페이지당 책 수
 
+    const currentBooks = React.useMemo(() => {
+        const indexOfLastBook = currentPage * booksPerPage;
+        const indexOfFirstBook = indexOfLastBook - booksPerPage;
+        return books.slice(indexOfFirstBook, indexOfLastBook);
+    }, [currentPage, books]);
+
     const sortedBooks = React.useMemo(() => {
-        return [...books].sort((a, b) => {
+        return [...currentBooks].sort((a, b) => {
             const idA = a.id ?? NaN; // undefined일 경우 NaN 처리
             const idB = b.id ?? NaN; // undefined일 경우 NaN 처리
             return (idA - idB); // NaN 처리로 undefined가 맨 뒤로 배치됨
@@ -32,8 +38,8 @@ const BookList: React.FC<BookListProps> = ({ books, openModal, onDelete }) => {
             header: '삭제',
             cell: ({ row }) => <button onClick={(e) => {
                 e.stopPropagation();
-                const id = row.original.id;
-                if (id !== undefined) {
+                const id = row.original.idKey;
+                if (id) {
                     onDelete(id);
                 }
             }}>삭제</button>

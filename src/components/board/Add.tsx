@@ -8,7 +8,6 @@ interface AddProps {
 }
 
 const Add: React.FC<AddProps> = ({ onClose, onSave, onAdd }) => {
-
     const [title, setTitle] = useState("");
     const [author, setAuthor] = useState("");
     const [publisher, setPublisehr] = useState("");
@@ -16,6 +15,7 @@ const Add: React.FC<AddProps> = ({ onClose, onSave, onAdd }) => {
 
     const saveHandler = () => {
         const newBook: Book = {
+            idKey: '',
             title,
             author: author ? author.split(",").map(name => name.trim()) : [],
             publisher,

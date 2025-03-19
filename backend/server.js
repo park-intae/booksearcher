@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const mysql = require("mysql2");
 const cors = require("cors");
+const { v4: uuidv4 } = require("uuid");
 
 const app = express();
 app.use(cors());
@@ -31,40 +32,43 @@ app.get("/books", async (req, res) => {
     });
 });
 
-app.put("/books/:id", (req, res) => {
-    const { id } = req.params;
+app.put("/books/:idKey", (req, res) => {
+    const { idKey } = req.params;
     const { title, author, publisher, stock } = req.body;
 
     db.query(
-        "UPDATE books SET title = ?, author = ?, publisher = ?, stock = ? WHERE id = ?",
-        [title, author, publisher, stock, id],
+        "UPDATE books SET title = ?, author = ?, publisher = ?, stock = ? WHERE idKey = ?",
+        [title, author, publisher, stock, idKey],
         (err, result) => {
             if (err) return res.status(500).json({ error: err });
             if (result.affectedRows === 0) {
                 return res.status(404).json({ message: "Book not found" });
             }
-            res.json({ id, title, author, publisher, stock });
+            res.json({ idKey, title, author, publisher, stock });
         }
     )
 });
 
 app.post("/books", (req, res) => {
     const { title, author, publisher, stock } = req.body;
+    const idKey = uuidv4();
+
     db.query(
-        "INSERT INTO books (title, author, publisher, stock) VALUES (?, ?, ?, ?)",
-        [title, author, publisher, stock],
+        "INSERT INTO books (idKey, title, author, publisher, stock) VALUES (?, ?, ?, ?, ?)",
+        [idKey, title, author, publisher, stock],
         (err, result) => {
             if (err) return res.status(500).json({ error: err });
-            res.json({ id: result.insertId, title, author, publisher, stock });
+            res.json({ id: result.insertId, idKey, title, author, publisher, stock });
         }
     );
-})
+});
 
-app.delete("/books/:id", (req, res) => {
-    const { id } = req.params;
+app.delete("/books/:idKey", (req, res) => {
+    const { idKey } = req.params;
+
     db.query(
-        "DELETE FROM books WHERE id = ?",
-        [id],
+        "DELETE FROM books WHERE idKey = ?",
+        [idKey],
         (err, result) => {
             if (err) return res.status(500).json({ error: err });
             if (result.affectedRows === 0) {

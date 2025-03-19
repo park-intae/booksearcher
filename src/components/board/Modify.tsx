@@ -8,7 +8,7 @@ interface ModifyProps {
 }
 
 const Modify: React.FC<ModifyProps> = ({ book, onClose, onSave }) => {
-    const defaultBook: Book = { id: 0, title: "", author: [], publisher: "", stock: 0 };
+    const defaultBook: Book = { idKey: "", title: "", author: [], publisher: "", stock: 0 };
     const currentBook = book ?? defaultBook;
 
     const [title, setTitle] = useState(currentBook.title);
@@ -19,6 +19,7 @@ const Modify: React.FC<ModifyProps> = ({ book, onClose, onSave }) => {
     const saveHandler = () => {
         const updatedBook: Book = {
             ...currentBook,
+            idKey: currentBook.idKey,
             title,
             author: author ? author.split(",").map(name => name.trim()) : [],
             publisher,

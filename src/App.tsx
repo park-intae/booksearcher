@@ -7,7 +7,6 @@ import type { Book } from './type/interface';
 import Search from './components/board/Search';
 
 function App() {
-  //Dummyfile
   const [books, setBooks] = useState<Book[]>([])
 
   //책 목록 가져오기
@@ -17,7 +16,7 @@ function App() {
         const response = await axios.get("http://localhost:5000/books");
         setBooks(response.data);
       } catch (error) {
-        console.log("책 목록을 가져오지 못했습니다. 오류코드 :", error);
+        console.log("책 목록을 가져오지 못했습니다. 오류 :", error);
       }
     }
     fetchBooks();
@@ -44,8 +43,8 @@ function App() {
   //Save Book
   const handleSaveBook = async (updatedBook: Book) => {
     try {
-      await axios.put(`http://localhost:5000/books/${updatedBook.id}`, updatedBook);
-      setBooks(prevBooks => prevBooks.map(book => book.id === updatedBook.id ? updatedBook : book));
+      await axios.put(`http://localhost:5000/books/${updatedBook.idKey}`, updatedBook);
+      setBooks(prevBooks => prevBooks.map(book => book.idKey === updatedBook.idKey ? updatedBook : book));
     } catch (error) {
       console.log("책을 저장하지 못했습니다. 오류코드 :", error);
     }
@@ -53,13 +52,10 @@ function App() {
 
   //Add Book
   const handleAddBook = async (newBook: Book) => {
-    const nextId = books.length > 0
-      ? Math.max(...books.map(book => book.id ?? 0)) + 1 : 1;
-
-    const bookWithId = { ...newBook, id: nextId };
+    const idKey = newBook.idKey || '';
 
     try {
-      await axios.post("http://localhost:5000/books", bookWithId);
+      await axios.post("http://localhost:5000/books", { ...newBook, idKey });
       setBooks(prevBooks => [...prevBooks, newBook]);
     } catch (error) {
       console.log("책을 추가하지 못했습니다. 오류코드 :", error);
@@ -67,15 +63,15 @@ function App() {
   }
 
   //Delete Book
-  const handleDeleteBook = async (id: number | undefined) => {
-    if (id === undefined) {
+  const handleDeleteBook = async (idKey: string) => {
+    if (!idKey) {
       console.log("책을 제거하지 못했습니다. id가 없습니다.");
       return;
     }
 
     try {
-      await axios.delete(`http://localhost:5000/books/${id}`);
-      setBooks(prevBooks => prevBooks.filter(book => book.id !== id));
+      await axios.delete(`http://localhost:5000/books/${idKey}`);
+      setBooks(prevBooks => prevBooks.filter(book => book.idKey !== idKey));
     } catch (error) {
       console.log("책을 제거하지 못했습니다. 오류코드 :", error);
     }
@@ -99,7 +95,7 @@ function App() {
   return (
     <div>
       <header>
-        {/* 로그인 버튼튼 */}
+        {/* 로그인 버튼 */}
         <button onClick={() => openModal('loginButton')}>login</button>
       </header>
       <main>
